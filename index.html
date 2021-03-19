@@ -1,0 +1,137 @@
+<html dir="rtl" lang="fa-IR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.rtl.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="form" class="px-2">
+      <div class="row">
+        <div class="col my-2">
+          <select class="form-select" id="row">
+            <option value="10" selected>10 row</option>
+            <option value="20">20 row</option>
+            <option value="50">50 row</option>
+          </select>
+        </div>
+        <div class="col my-2">
+          <select class="form-select" id="column">
+            <option value="10" selected>10 column</option>
+            <option value="20">20 column</option>
+            <option value="50">50 column</option>
+          </select>
+        </div>
+      </div>
+      <div class="row my-2">
+        <div class="col-12">
+          <button
+            type="button"
+            class="btn btn-outline-primary w-100"
+            onclick="refreshData()"
+          >
+            Reset
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="graph" class="m-3" />
+  </body>
+</html>
+<script type="text/javascript" src="./js/binary-heap.js"></script>
+<script type="text/javascript" src="./js/graph.js"></script>
+<script type="text/javascript" src="./js/astar.js"></script>
+<script type="text/javascript" src="./js/utils.js"></script>
+<script type="text/javascript">
+  var row_count, column_count, start, end, graph, result;
+  function refreshData() {
+    row_count = document.getElementById("row").value;
+    column_count = document.getElementById("column").value;
+    document.getElementById("graph").innerHTML = "";
+    //next
+    initGraph();
+  }
+  function initGraph() {
+    const count_x = column_count;
+    const count_y = row_count;
+
+    const map = new Array(count_y);
+    for (let i = 0; i < count_y; i++) {
+      map[i] = [];
+      for (let j = 0; j < count_x; j++) {
+        map[i][j] = Math.random() > 0.2 ? 1 : 0;
+      }
+    }
+
+    const locations = [];
+    while (locations.length < 4) {
+      const x1 = Math.floor(Math.random() * count_y);
+      const y1 = Math.floor(Math.random() * count_x);
+
+      if (map[x1][y1] === 1) {
+        if (
+          locations.length > 0 &&
+          locations[0] !== x1 &&
+          locations[1] !== y1
+        ) {
+          locations.push(x1, y1);
+        } else if (locations.length === 0) {
+          locations.push(x1, y1);
+        }
+      }
+    }
+
+    graph = new Graph(map);
+    start = graph.grid[locations[0]][locations[1]];
+    end = graph.grid[locations[2]][locations[3]];
+    result = astar.search(graph, start, end);
+
+    //next
+    setGraphUI();
+  }
+
+  function setGraphUI() {
+    const { x, y } = graph.getGraphDimension();
+
+    document.getElementById("graph").style.width = x * 20;
+    const start_location_index = start.x * x + start.y;
+    const end_location_index = end.x * x + end.y;
+
+    for (let i = 0; i < x * y; i++) {
+      var node = document.createElement("div");
+      node.id = `node_${i}`;
+
+      // Wall and other nodes
+      node.style.backgroundImage = graph.nodes[i].weight
+        ? ""
+        : "url('./assets/wall.png')";
+      if ([start_location_index, end_location_index].includes(i)) {
+        node.style.backgroundImage = "url('./assets/location.png')";
+        node.style.backgroundColor = "rgb(139, 195, 74)";
+      }
+
+      // Dirty nodes
+      const dirtyNodes = graph.dirtyNodes;
+
+      for (let j = 0; j < dirtyNodes.length; j++) {
+        const dirtyNode = dirtyNodes[j];
+        if (dirtyNode.x * x + dirtyNode.y === i && i !== start_location_index) {
+          node.style.backgroundColor = "#FFD600";
+        }
+      }
+
+      // Path nodes
+      for (let j = 0; j < result.length; j++) {
+        if (result[j].x * x + result[j].y === i) {
+          node.style.backgroundColor = "rgb(139, 195, 74)";
+        }
+      }
+
+      document.getElementById("graph").appendChild(node);
+    }
+  }
+  refreshData();
+</script>

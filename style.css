@@ -1,0 +1,23 @@
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+div[id^="node_"] {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 1px solid gray;
+  background-size: cover;
+}
+
+#form {
+  width: 100%;
+}
+@media (min-width: 576px) {
+  #form {
+    width: 50%;
+  }
+}
