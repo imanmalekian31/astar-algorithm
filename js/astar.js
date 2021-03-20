@@ -61,10 +61,10 @@ var astar = {
     return [];
   },
   heuristics: {
-    manhattan: function (pos0, pos1) {
-      const d1 = Math.abs(pos1.x - pos0.x);
-      const d2 = Math.abs(pos1.y - pos0.y);
-      return d1 + d2;
+    manhattan: function (node, goal) {
+      const dx = Math.abs(goal.x - node.x);
+      const dy = Math.abs(goal.y - node.y);
+      return dx + dy;
     },
   },
 };
