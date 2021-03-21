@@ -66,5 +66,10 @@ var astar = {
       const dy = Math.abs(goal.y - node.y);
       return dx + dy;
     },
+    euclidean: function (node, goal) {
+      const dx = Math.abs(goal.x - node.x);
+      const dy = Math.abs(goal.y - node.y);
+      return Math.sqrt(dx * dx + dy * dy);
+    },
   },
 };
